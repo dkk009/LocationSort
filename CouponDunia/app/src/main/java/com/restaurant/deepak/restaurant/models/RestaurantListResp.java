@@ -5,15 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.restaurant.deepak.restaurant.interfaces.IDataModel;
 
-public class RestaurantList {
+public class RestaurantListResp implements IDataModel {
 
     @SerializedName("status")
     @Expose
     private Status status;
     @SerializedName("data")
     @Expose
-    private List<Datum> data = new ArrayList<Datum>();
+    private List<Restaurant> data = new ArrayList<Restaurant>();
     @SerializedName("hash")
     @Expose
     private String hash;
@@ -41,7 +42,7 @@ public class RestaurantList {
      * @return
      *     The data
      */
-    public List<Datum> getData() {
+    public List<Restaurant> getData() {
         return data;
     }
 
@@ -50,7 +51,7 @@ public class RestaurantList {
      * @param data
      *     The data
      */
-    public void setData(List<Datum> data) {
+    public void setData(List<Restaurant> data) {
         this.data = data;
     }
 
