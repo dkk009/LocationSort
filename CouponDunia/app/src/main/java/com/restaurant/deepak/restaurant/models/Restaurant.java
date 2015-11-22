@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.restaurant.deepak.restaurant.interfaces.IDataModel;
 
 
-
-public class Datum {
+public class Restaurant implements IDataModel{
 
     @SerializedName("SubFranchiseID")
     @Expose
@@ -536,5 +536,20 @@ public class Datum {
         this.CoverURL = CoverURL;
     }
 
+    public Restaurant clone() {
+        try {
+            Restaurant restaurant = (Restaurant)super.clone();
+            List<Category> categoryList = new ArrayList<>();
+            if(null != Categories) {
+                for(Category category : Categories) {
+                    categoryList.add(category.clone());
+                }
+            }
+            return restaurant;
+        }catch (Exception e) {
+
+        }
+        return this;
+    }
 
 }

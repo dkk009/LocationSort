@@ -3,8 +3,9 @@ package com.restaurant.deepak.restaurant.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.restaurant.deepak.restaurant.interfaces.IDataModel;
 
-public class Status {
+public class Status implements IDataModel {
 
     @SerializedName("rcode")
     @Expose
@@ -47,6 +48,15 @@ public class Status {
      */
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public Status clone() {
+        try {
+            return (Status)super.clone();
+        }catch (Exception e) {
+
+        }
+        return this;
     }
 
 

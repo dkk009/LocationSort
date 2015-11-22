@@ -4,10 +4,10 @@ package com.restaurant.deepak.restaurant.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.restaurant.deepak.restaurant.interfaces.IDataModel;
 
 
-
-public class Category {
+public class Category implements IDataModel{
 
     @SerializedName("OfflineCategoryID")
     @Expose
@@ -94,5 +94,13 @@ public class Category {
         this.CategoryType = CategoryType;
     }
 
+    public Category clone() {
+        try {
+            return (Category)super.clone();
+        }catch (Exception e) {
+
+        }
+        return this;
+    }
 
 }

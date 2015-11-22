@@ -5,5 +5,5 @@ import java.io.Serializable;
 /**
  *
  */
-public interface IDataModel extends Serializable {
+public interface IDataModel extends Serializable,Cloneable {
 }
