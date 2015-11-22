@@ -33,12 +33,12 @@
                         android:padding="5dp"
                         android:text="Restaurant"
                         android:textSize="@dimen/twenty_two_sp"/>
-                    <RadioButton
+                    <CheckBox
                         android:layout_width="@dimen/forty_eight_dp"
                         android:layout_height="@dimen/forty_eight_dp"
-                        android:button="none"
                         android:layout_alignParentRight="true"
-                        android:background="@drawable/favorite"
+                        android:layout_margin="5dp"
+                        style="@style/favorite_btn_style"
                         android:id="@+id/radio_favorite"/>
 
                     <TextView

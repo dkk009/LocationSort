@@ -536,5 +536,20 @@ public class Restaurant implements IDataModel{
         this.CoverURL = CoverURL;
     }
 
+    public Restaurant clone() {
+        try {
+            Restaurant restaurant = (Restaurant)super.clone();
+            List<Category> categoryList = new ArrayList<>();
+            if(null != Categories) {
+                for(Category category : Categories) {
+                    categoryList.add(category.clone());
+                }
+            }
+            return restaurant;
+        }catch (Exception e) {
+
+        }
+        return this;
+    }
 
 }

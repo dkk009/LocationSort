@@ -2,4 +2,11 @@
     <string name="app_name">Restaurant</string>
     <string name="action_settings">Settings</string>
     <string name="dot">\u2B24</string>
+
+    <string-array name="tab_names">
+        <item>IN YOUR CITY</item>
+        <item>NEAR BY</item>
+        <item>BEST OFFERS</item>
+    </string-array>
+
 </resources>
