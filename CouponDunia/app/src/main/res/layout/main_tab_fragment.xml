@@ -19,20 +19,19 @@
             app:layout_scrollFlags="enterAlways"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"></android.support.v7.widget.Toolbar>
 
-        <com.restaurant.deepak.restaurant.custom_views.SlidingTabLayout
-            android:id="@+id/sliding_tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/toolbar"
-            android:layout_centerVertical="true"/>
-
     </android.support.design.widget.AppBarLayout>
+    <com.restaurant.deepak.restaurant.custom_views.SlidingTabLayout
+        android:id="@+id/sliding_tabs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/tab_appbar"
+        android:layout_centerVertical="true"/>
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/tab_appbar"
+        android:layout_below="@id/sliding_tabs"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
     <ProgressBar
         android:id="@+id/progress_bar"

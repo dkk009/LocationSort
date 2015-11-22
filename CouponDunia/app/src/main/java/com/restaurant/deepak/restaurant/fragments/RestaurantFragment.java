@@ -1,7 +1,9 @@
 package com.restaurant.deepak.restaurant.fragments;
 
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,6 +11,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.restaurant.deepak.restaurant.R;
@@ -16,11 +20,10 @@ import com.restaurant.deepak.restaurant.adapter.RestaurantAdapter;
 import com.restaurant.deepak.restaurant.constants.Constants;
 import com.restaurant.deepak.restaurant.location.LocationTracker;
 import com.restaurant.deepak.restaurant.models.Restaurant;
-import com.restaurant.deepak.restaurant.models.RestaurantListResp;
 import com.restaurant.deepak.restaurant.utility.LocationUtility;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -32,6 +35,11 @@ public class RestaurantFragment extends BaseFragment {
     private RecyclerView mRecyclerView;
     private ArrayList<Restaurant> mRestaurantListResp;
     private LocationTracker mLocationTracker;
+    private TextView mTxtLocationName;
+    private int sortType;
+    private ProgressBar mProgressbar;
+    private String mLocationName;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -42,6 +50,8 @@ public class RestaurantFragment extends BaseFragment {
 
     private void initView(View view) {
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_restaurant);
+        mTxtLocationName = (TextView) view.findViewById(R.id.txt_location_name);
+        mProgressbar = (ProgressBar)view.findViewById(R.id.progress_bar);
     }
 
     @Override
@@ -51,43 +61,74 @@ public class RestaurantFragment extends BaseFragment {
     }
 
     private void init() {
-
+        mLocationTracker = new LocationTracker(getActivity());
+        mLocationTracker.getLocation();
         mRestaurantListResp = (ArrayList<Restaurant>) getArguments().get(Constants.DATA);
-        int sortType = getArguments().getInt(Constants.SORT_ORDER);
-        if(null != mRestaurantListResp) {
-            switch (sortType) {
-                case Constants.SORT_LOCATION:
-                    sortBasedOnLocation();
-                    break;
-                case Constants.SORT_NEARBY:
-                    sortBasedOnCurrentLocation();
-                    break;
-                case Constants.SORT_OFFER:
-                    sortBasedOnOffer();
-                    break;
+        sortType = getArguments().getInt(Constants.SORT_ORDER);
+        processRestaurantList();
+
+    }
+
+
+
+    public void processRestaurantList() {
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                mProgressbar.setVisibility(View.VISIBLE);
             }
-            populateData();
-        }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                if(mLocationTracker.isLocationServiceEnabled()) {
+                    try {
+                        mLocationName = LocationUtility.getAddressFromLatLang(mLocationTracker.getmLastKnownLocation());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (null != mRestaurantListResp) {
+                    switch (sortType) {
+                        case Constants.SORT_LOCATION:
+                            sortBasedOnLocation();
+                            break;
+                        case Constants.SORT_NEARBY:
+                            sortBasedOnCurrentLocation();
+                            break;
+                        case Constants.SORT_OFFER:
+                            sortBasedOnOffer();
+                            break;
+                    }
+
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+
+                populateData();
+            }
+        }.execute();
+
     }
 
     private void sortBasedOnCurrentLocation() {
-        mLocationTracker = new LocationTracker(getActivity());
-        mLocationTracker.getLocation();
-        if(!mLocationTracker.isLocationServiceEnabled()) {
-            Toast.makeText(getActivity(),"Please Enable Location Service",Toast.LENGTH_SHORT).show();
-            return;
-        }else {
-            if(calculateDistance()) {
-                sortBasedOnLocation();
-                populateData();
-            }else {
-                Toast.makeText(getActivity(),"Location based Sorting Failed",Toast.LENGTH_SHORT).show();
-            }
-        }
-
+         calculateDistance();
+         sortBasedOnLocation();
     }
 
     private void populateData() {
+        mProgressbar.setVisibility(View.GONE);
+        if(!mLocationTracker.isLocationServiceEnabled()) {
+            mTxtLocationName.setText(getString(R.string.location_error));
+            mTxtLocationName.setTextColor(Color.RED);
+        }else {
+            mTxtLocationName.setText(mLocationName);
+        }
         RestaurantAdapter restaurantAdapter = new RestaurantAdapter(mRestaurantListResp);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);

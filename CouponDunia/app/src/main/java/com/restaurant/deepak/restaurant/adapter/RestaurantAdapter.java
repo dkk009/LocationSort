@@ -84,13 +84,20 @@ public class RestaurantAdapter  extends RecyclerView.Adapter<RestaurantAdapter.R
                 }
             }
             mTxtCategories.setText(categoryStr);
-            double distance = restaurant.getDistance()/1000;
+            double distance = restaurant.getDistance();
+            String unit = " m ";
+            if(restaurant.getDistance() > 1000) {
+                distance = distance / 1000;
+                unit = " km ";
+            }
+
             DecimalFormat decimalFormat = new DecimalFormat("0.00");
             String formattedValue =decimalFormat.format(distance);
 
             try {
-                String distStr = ""+ ((Double)decimalFormat.parse(formattedValue)) + " m " + restaurant.getCityName();
+                String distStr = ""+ ((Double)decimalFormat.parse(formattedValue)) + unit + restaurant.getCityName();
                 mTxtLocation.setText(distStr);
+
             } catch (ParseException e) {
                 e.printStackTrace();
             }

@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -62,22 +63,29 @@ public class MainTabFragment extends BaseFragment {
     }
 
     private void initViews(View view) {
+        ((AppCompatActivity)getActivity()).setSupportActionBar((Toolbar) view.findViewById(R.id.toolbar));
+        if (((AppCompatActivity)getActivity()) != null) {
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setCustomView(R.layout.search_view);
+        }
+
         mToolBar = (Toolbar) view.findViewById(R.id.toolbar);
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mViewPager = (ViewPager) view.findViewById(R.id.viewpager);
         mProgressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
+
+
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setHasOptionsMenu(true);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         init();
     }
 
@@ -104,7 +112,7 @@ public class MainTabFragment extends BaseFragment {
         mProgressBar.setVisibility(View.GONE);
         String[] title = getResources().getStringArray(R.array.tab_names);
         TabAdapter tabAdapter = new TabAdapter(getFragmentManager(),title,resp);
-        mViewPager.setOffscreenPageLimit(1);
+       // mSlidingTabLayout.setCustomTabView(R.layout.layout_tab,R.id.txt_tab_name);
         mViewPager.setAdapter(tabAdapter);
         mSlidingTabLayout.setViewPager(mViewPager);
     }
@@ -174,12 +182,8 @@ public class MainTabFragment extends BaseFragment {
                 case NEAR_BY_TAB:
                     bundle = new Bundle();
                     restaurantList = new ArrayList<>();
-                    boolean isAdded = true;
                     for(Restaurant restaurant : mRestaurantList.getRestaurantList()) {
-                        if(isAdded) {
-                            restaurantList.add(restaurant.clone());
-                        }
-                        isAdded = false;
+                        restaurantList.add(restaurant.clone());
                     }
                     bundle.putSerializable(Constants.DATA, restaurantList);
                     bundle.putInt(Constants.SORT_ORDER, Constants.SORT_NEARBY);
