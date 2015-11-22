@@ -1,5 +1,6 @@
 package com.restaurant.deepak.restaurant.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -91,7 +93,7 @@ public class MainTabFragment extends BaseFragment {
 
     private void init() {
         if(!CommonUtility.isInternetAvailable()) {
-            Toast.makeText(getActivity(),"Error",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(),"Network Error",Toast.LENGTH_LONG).show();
             return;
         }
         mProgressBar.setVisibility(View.VISIBLE);
@@ -123,15 +125,14 @@ public class MainTabFragment extends BaseFragment {
 
     }
 
+
    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.clear();
         inflater.inflate(R.menu.menu_main,menu);
         MenuItem item = menu.findItem(R.id.action_search);
         mSearchView = new SearchView(((MainActivity) getActivity()).getSupportActionBar().getThemedContext());
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
         MenuItemCompat.setActionView(item, mSearchView);
-
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -149,6 +150,21 @@ public class MainTabFragment extends BaseFragment {
             }
         });
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_search) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public static class  TabAdapter extends FragmentStatePagerAdapter {

@@ -10,7 +10,6 @@
         android:id="@+id/txt_location_name"
         android:background="@drawable/round_bg"
         android:textSize="@dimen/fifteen_sp"
-        android:text="HelloWorld"
         android:layout_margin="@dimen/two_dp"
         android:drawableLeft="@drawable/location_marker"
         android:padding="@dimen/ten_dp"
