@@ -119,7 +119,7 @@ public class RestaurantAdapter  extends RecyclerView.Adapter<RestaurantAdapter.R
                     boolean status = !((Restaurant)v.getTag()).isFavorite();
                             ((CheckBox)v).setChecked(status);
                     ((Restaurant)v.getTag()).setFavorite(status);
-                        listener.updateFavorite(status,pos);
+                        listener.updateFavorite(status,((Restaurant)v.getTag()));
 
                 }
             });

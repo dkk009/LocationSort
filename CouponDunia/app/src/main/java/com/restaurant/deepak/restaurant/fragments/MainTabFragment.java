@@ -1,11 +1,8 @@
 package com.restaurant.deepak.restaurant.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
@@ -19,9 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -39,7 +34,6 @@ import com.restaurant.deepak.restaurant.network.RequestHandler;
 import com.restaurant.deepak.restaurant.utility.CommonUtility;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -56,6 +50,7 @@ public class MainTabFragment extends BaseFragment implements IntrEventListener{
     private ProgressBar mProgressBar;
     private SearchView mSearchView;
     private RestaurantListResp mRestaurantListResp;
+    private TabAdapter mTabAdapter;
 
     @Nullable
     @Override
@@ -116,15 +111,13 @@ public class MainTabFragment extends BaseFragment implements IntrEventListener{
         mProgressBar.setVisibility(View.GONE);
         mRestaurantListResp = resp;
         String[] title = getResources().getStringArray(R.array.tab_names);
-        TabAdapter tabAdapter = new TabAdapter(MainTabFragment.this,title,mRestaurantListResp);
-        mViewPager.setAdapter(tabAdapter);
+        mTabAdapter = new TabAdapter(MainTabFragment.this,title,mRestaurantListResp);
+        mViewPager.setAdapter(mTabAdapter);
         mSlidingTabLayout.setViewPager(mViewPager);
     }
 
     private void handleRequestFailure(VolleyError error) {
         mProgressBar.setVisibility(View.GONE);
-
-
     }
 
 
@@ -170,8 +163,15 @@ public class MainTabFragment extends BaseFragment implements IntrEventListener{
     }
 
     @Override
-    public void updateFavorite(boolean status, int pos) {
-        mRestaurantListResp.getRestaurantList().get(pos).setFavorite(status);
+    public void updateFavorite(boolean status, Restaurant restaurant) {
+        for(Restaurant res: mRestaurantListResp.getRestaurantList()) {
+            if(res.equals(restaurant)) {
+                res.setFavorite(status);
+            }
+        }
+        for(int i =0;i<mTabAdapter.getCount();i++) {
+            ((RestaurantFragment)mTabAdapter.getItem(i)).updateList(restaurant);
+        }
     }
 
     public static class  TabAdapter extends FragmentStatePagerAdapter {

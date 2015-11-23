@@ -1,6 +1,8 @@
 
 package com.restaurant.deepak.restaurant.models;
 
+import android.text.TextUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import com.google.gson.annotations.Expose;
@@ -559,5 +561,21 @@ public class Restaurant implements IDataModel{
 
     public void setFavorite(boolean favorite) {
         this.favorite = favorite;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof  Restaurant) {
+            Restaurant restaurant = (Restaurant)o;
+            if(TextUtils.equals(restaurant.BrandID,getBrandID()) &&(TextUtils.equals(restaurant.getOutletID(),getOutletID()))) {
+                return  true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return getBrandID().hashCode() + getOutletID().hashCode();
     }
 }
