@@ -188,13 +188,13 @@ public class RestaurantFragment extends BaseFragment {
         if(null == mRestaurantListResp) {
             return;
         }
-        for(Restaurant res : mRestaurantListResp) {
+       /* for(Restaurant res : mRestaurantListResp) {
             if(res.equals(restaurant)) {
                 res.setFavorite(restaurant.isFavorite());
-                mRestaurantAdapter.notifyItemChanged(i);
+                mRestaurantAdapter.notifyDataSetChanged();
                 break;
             }
             i++;
-        }
+        }*/
     }
 }

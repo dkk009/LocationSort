@@ -3,6 +3,7 @@ package com.restaurant.deepak.restaurant.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
@@ -10,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +25,7 @@ import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.restaurant.deepak.restaurant.R;
 import com.restaurant.deepak.restaurant.activities.MainActivity;
+import com.restaurant.deepak.restaurant.adapter.CustomFragmentStatePager;
 import com.restaurant.deepak.restaurant.constants.Constants;
 import com.restaurant.deepak.restaurant.constants.Url;
 import com.restaurant.deepak.restaurant.custom_views.SlidingTabLayout;
@@ -170,10 +173,20 @@ public class MainTabFragment extends BaseFragment implements IntrEventListener{
             }
         }
         for(int i =0;i<mTabAdapter.getCount();i++) {
-            ((RestaurantFragment)mTabAdapter.getItem(i)).updateList(restaurant);
+
+            if(i != mViewPager.getCurrentItem()) {
+                RestaurantFragment restaurantFragment = ((RestaurantFragment) mTabAdapter.getItem(i));
+                if(null != restaurantFragment)
+                restaurantFragment.updateList(restaurant);
+            }
         }
+        mTabAdapter.notifyDataSetChanged();
     }
 
+   /* public Fragment findFragmentByPosition(int position) {
+        TabAdapter fragmentPagerAdapter = mTabAdapter;
+        return getChildFragmentManager().findFragmentByTag("android:switcher:" + mViewPager.getId() + ":" + mTabAdapter.getItemId(position));
+    }*/
     public static class  TabAdapter extends FragmentStatePagerAdapter {
 
         private static final int NUM_FRAGMENTS = 3;
@@ -181,8 +194,9 @@ public class MainTabFragment extends BaseFragment implements IntrEventListener{
 
         private RestaurantListResp mRestaurantList;
         private Fragment mFragment;
+        private SparseArray<RestaurantFragment> mFragmentList = new SparseArray<>();
         public TabAdapter(MainTabFragment fragment, String[] pageTitle,RestaurantListResp restaurantList) {
-            super(fragment.getFragmentManager());
+            super(fragment.getChildFragmentManager());
             this.pageTitle = pageTitle;
             mRestaurantList = restaurantList;
             mFragment = fragment;
@@ -226,14 +240,30 @@ public class MainTabFragment extends BaseFragment implements IntrEventListener{
                     break;
             }
             baseFragment.setEventListener((MainTabFragment)mFragment);
+            mFragmentList.put(position, baseFragment);
             return baseFragment;
         }
 
 
+        @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            mFragmentList.remove(position);
+            //container.removeView(((RestaurantFragment) object).getView());
+
+        }
 
         @Override
         public int getCount() {
             return NUM_FRAGMENTS;
+        }
+
+        public RestaurantFragment getRestaurantFragment(int pos) {
+            return mFragmentList.get(pos);
         }
 
         @Override
