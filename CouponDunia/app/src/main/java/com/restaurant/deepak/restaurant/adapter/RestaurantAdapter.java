@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.restaurant.deepak.restaurant.R;
+import com.restaurant.deepak.restaurant.interfaces.IntrEventListener;
 import com.restaurant.deepak.restaurant.models.Category;
 import com.restaurant.deepak.restaurant.models.Restaurant;
 import com.restaurant.deepak.restaurant.network.ImageDownloader;
@@ -27,9 +29,12 @@ import java.util.List;
  */
 public class RestaurantAdapter  extends RecyclerView.Adapter<RestaurantAdapter.RestaurantViewHolder>{
 
+    private final IntrEventListener mEventListener;
     private List<Restaurant> mRestaurantList;
-    public RestaurantAdapter(List<Restaurant> restaurantList) {
+
+    public RestaurantAdapter(List<Restaurant> restaurantList,IntrEventListener listener) {
         mRestaurantList = restaurantList;
+        mEventListener = listener;
     }
 
     @Override
@@ -41,7 +46,7 @@ public class RestaurantAdapter  extends RecyclerView.Adapter<RestaurantAdapter.R
 
     @Override
     public void onBindViewHolder(RestaurantViewHolder holder, int position) {
-            holder.bindData(mRestaurantList.get(position));
+            holder.bindData(mRestaurantList.get(position),position,mEventListener);
     }
 
     @Override
@@ -56,7 +61,7 @@ public class RestaurantAdapter  extends RecyclerView.Adapter<RestaurantAdapter.R
         private TextView mTxtName;
         private TextView mTxtCategories;
         private TextView mTxtLocation;
-        private RadioButton mRadioFavorite;
+        private CheckBox mRadioFavorite;
         private TextView mTxtOffer;
         private Context mContext;
         public RestaurantViewHolder(View itemView) {
@@ -72,9 +77,10 @@ public class RestaurantAdapter  extends RecyclerView.Adapter<RestaurantAdapter.R
             mTxtCategories = (TextView) mView.findViewById(R.id.txt_category);
             mTxtLocation = (TextView) mView.findViewById(R.id.txt_location);
             mTxtOffer = (TextView) mView.findViewById(R.id.txt_number_of_offer);
+            mRadioFavorite = (CheckBox) mView.findViewById(R.id.radio_favorite);
         }
 
-        public void bindData(Restaurant restaurant) {
+        public void bindData(Restaurant restaurant,final int pos,final IntrEventListener listener) {
             mTxtName.setText(restaurant.getBrandName());
             List<Category> categoryList = restaurant.getCategories();
             String categoryStr = "";
@@ -105,6 +111,18 @@ public class RestaurantAdapter  extends RecyclerView.Adapter<RestaurantAdapter.R
                 String offerStr = restaurant.getNumCoupons() + " " + (restaurant.getNumCoupons() > 1 ? "Offers" : "Offer");
                 mTxtOffer.setText(offerStr);
             }
+            mRadioFavorite.setChecked(restaurant.isFavorite());
+            mRadioFavorite.setTag(restaurant);
+            mRadioFavorite.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    boolean status = !((Restaurant)v.getTag()).isFavorite();
+                            ((CheckBox)v).setChecked(status);
+                    ((Restaurant)v.getTag()).setFavorite(status);
+                        listener.updateFavorite(status,pos);
+
+                }
+            });
             downloadImage(restaurant.getLogoURL());
         }
 

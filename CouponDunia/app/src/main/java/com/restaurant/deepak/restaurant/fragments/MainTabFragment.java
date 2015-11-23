@@ -32,6 +32,7 @@ import com.restaurant.deepak.restaurant.constants.Constants;
 import com.restaurant.deepak.restaurant.constants.Url;
 import com.restaurant.deepak.restaurant.custom_views.SlidingTabLayout;
 import com.restaurant.deepak.restaurant.interfaces.IDataModel;
+import com.restaurant.deepak.restaurant.interfaces.IntrEventListener;
 import com.restaurant.deepak.restaurant.models.Restaurant;
 import com.restaurant.deepak.restaurant.models.RestaurantListResp;
 import com.restaurant.deepak.restaurant.network.RequestHandler;
@@ -43,7 +44,7 @@ import java.util.List;
 /**
  *
  */
-public class MainTabFragment extends BaseFragment {
+public class MainTabFragment extends BaseFragment implements IntrEventListener{
 
     private static final int IN_YOUR_CITY_TAB = 0;
     private static final int NEAR_BY_TAB = 1;
@@ -54,6 +55,7 @@ public class MainTabFragment extends BaseFragment {
     private Toolbar mToolBar;
     private ProgressBar mProgressBar;
     private SearchView mSearchView;
+    private RestaurantListResp mRestaurantListResp;
 
     @Nullable
     @Override
@@ -112,9 +114,9 @@ public class MainTabFragment extends BaseFragment {
 
     private void handleRequestResp(RestaurantListResp resp) {
         mProgressBar.setVisibility(View.GONE);
+        mRestaurantListResp = resp;
         String[] title = getResources().getStringArray(R.array.tab_names);
-        TabAdapter tabAdapter = new TabAdapter(getFragmentManager(),title,resp);
-       // mSlidingTabLayout.setCustomTabView(R.layout.layout_tab,R.id.txt_tab_name);
+        TabAdapter tabAdapter = new TabAdapter(MainTabFragment.this,title,mRestaurantListResp);
         mViewPager.setAdapter(tabAdapter);
         mSlidingTabLayout.setViewPager(mViewPager);
     }
@@ -167,21 +169,28 @@ public class MainTabFragment extends BaseFragment {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void updateFavorite(boolean status, int pos) {
+        mRestaurantListResp.getRestaurantList().get(pos).setFavorite(status);
+    }
+
     public static class  TabAdapter extends FragmentStatePagerAdapter {
 
         private static final int NUM_FRAGMENTS = 3;
         private String pageTitle[];
 
         private RestaurantListResp mRestaurantList;
-        public TabAdapter(FragmentManager fragmentManager, String[] pageTitle,RestaurantListResp restaurantList) {
-            super(fragmentManager);
+        private Fragment mFragment;
+        public TabAdapter(MainTabFragment fragment, String[] pageTitle,RestaurantListResp restaurantList) {
+            super(fragment.getFragmentManager());
             this.pageTitle = pageTitle;
             mRestaurantList = restaurantList;
+            mFragment = fragment;
         }
 
         @Override
         public Fragment getItem(int position) {
-            BaseFragment baseFragment = new RestaurantFragment();
+            RestaurantFragment baseFragment = new RestaurantFragment();
             Bundle bundle;
             ArrayList<Restaurant> restaurantList;
             switch (position) {
@@ -216,7 +225,7 @@ public class MainTabFragment extends BaseFragment {
                     baseFragment.setArguments(bundle);
                     break;
             }
-
+            baseFragment.setEventListener((MainTabFragment)mFragment);
             return baseFragment;
         }
 
@@ -232,5 +241,7 @@ public class MainTabFragment extends BaseFragment {
             return pageTitle[position];
         }
     }
+
+
 
 }
