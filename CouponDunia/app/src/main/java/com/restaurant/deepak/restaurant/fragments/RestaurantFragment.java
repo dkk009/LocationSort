@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.restaurant.deepak.restaurant.R;
 import com.restaurant.deepak.restaurant.adapter.RestaurantAdapter;
 import com.restaurant.deepak.restaurant.constants.Constants;
+import com.restaurant.deepak.restaurant.interfaces.IntrEventListener;
 import com.restaurant.deepak.restaurant.location.LocationTracker;
 import com.restaurant.deepak.restaurant.models.Restaurant;
 import com.restaurant.deepak.restaurant.utility.LocationUtility;
@@ -39,6 +40,7 @@ public class RestaurantFragment extends BaseFragment {
     private int sortType;
     private ProgressBar mProgressbar;
     private String mLocationName;
+    private IntrEventListener mEventListener;
 
     @Nullable
     @Override
@@ -54,6 +56,9 @@ public class RestaurantFragment extends BaseFragment {
         mProgressbar = (ProgressBar)view.findViewById(R.id.progress_bar);
     }
 
+    public void setEventListener(IntrEventListener listener) {
+        mEventListener = listener;
+    }
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -129,7 +134,7 @@ public class RestaurantFragment extends BaseFragment {
         }else {
             mTxtLocationName.setText(mLocationName);
         }
-        RestaurantAdapter restaurantAdapter = new RestaurantAdapter(mRestaurantListResp);
+        RestaurantAdapter restaurantAdapter = new RestaurantAdapter(mRestaurantListResp,mEventListener);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(restaurantAdapter);

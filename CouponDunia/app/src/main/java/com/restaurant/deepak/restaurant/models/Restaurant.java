@@ -85,6 +85,7 @@ public class Restaurant implements IDataModel{
     @SerializedName("CoverURL")
     @Expose
     private String CoverURL;
+    private boolean favorite;
 
     /**
      * 
@@ -552,4 +553,11 @@ public class Restaurant implements IDataModel{
         return this;
     }
 
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
+    }
 }
