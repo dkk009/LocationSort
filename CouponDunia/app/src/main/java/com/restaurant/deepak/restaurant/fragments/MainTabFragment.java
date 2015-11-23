@@ -180,13 +180,10 @@ public class MainTabFragment extends BaseFragment implements IntrEventListener{
                 restaurantFragment.updateList(restaurant);
             }
         }
-        mTabAdapter.notifyDataSetChanged();
+       mTabAdapter.notifyDataSetChanged();
     }
 
-   /* public Fragment findFragmentByPosition(int position) {
-        TabAdapter fragmentPagerAdapter = mTabAdapter;
-        return getChildFragmentManager().findFragmentByTag("android:switcher:" + mViewPager.getId() + ":" + mTabAdapter.getItemId(position));
-    }*/
+
     public static class  TabAdapter extends FragmentStatePagerAdapter {
 
         private static final int NUM_FRAGMENTS = 3;
@@ -253,7 +250,7 @@ public class MainTabFragment extends BaseFragment implements IntrEventListener{
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
             mFragmentList.remove(position);
-            //container.removeView(((RestaurantFragment) object).getView());
+            super.destroyItem(container,position,object);
 
         }
 
