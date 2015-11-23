@@ -191,7 +191,7 @@ public class RestaurantFragment extends BaseFragment {
         for(Restaurant res : mRestaurantListResp) {
             if(res.equals(restaurant)) {
                 res.setFavorite(restaurant.isFavorite());
-                mRestaurantAdapter.notifyDataSetChanged();
+                mRestaurantAdapter.notifyItemChanged(i);
                 break;
             }
             i++;
