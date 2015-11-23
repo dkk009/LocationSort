@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.restaurant.deepak.restaurant.R;
 import com.restaurant.deepak.restaurant.adapter.RestaurantAdapter;
@@ -41,6 +40,7 @@ public class RestaurantFragment extends BaseFragment {
     private ProgressBar mProgressbar;
     private String mLocationName;
     private IntrEventListener mEventListener;
+    private RestaurantAdapter mRestaurantAdapter;
 
     @Nullable
     @Override
@@ -134,10 +134,10 @@ public class RestaurantFragment extends BaseFragment {
         }else {
             mTxtLocationName.setText(mLocationName);
         }
-        RestaurantAdapter restaurantAdapter = new RestaurantAdapter(mRestaurantListResp,mEventListener);
+        mRestaurantAdapter = new RestaurantAdapter(mRestaurantListResp,mEventListener);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setAdapter(restaurantAdapter);
+        mRecyclerView.setAdapter(mRestaurantAdapter);
     }
 
     public void sortBasedOnLocation() {
@@ -174,12 +174,27 @@ public class RestaurantFragment extends BaseFragment {
             @Override
             public int compare(Restaurant lhs, Restaurant rhs) {
                 if(lhs.getNumCoupons() > rhs.getNumCoupons()) {
-                    return 1;
-                }else if(lhs.getNumCoupons() < rhs.getNumCoupons()) {
                     return -1;
+                }else if(lhs.getNumCoupons() < rhs.getNumCoupons()) {
+                    return 1;
                 }
                 return 0;
             }
         });
+    }
+
+    public void updateList(Restaurant restaurant) {
+        int i=0;
+        if(null == mRestaurantListResp) {
+            return;
+        }
+        for(Restaurant res : mRestaurantListResp) {
+            if(res.equals(restaurant)) {
+                res.setFavorite(restaurant.isFavorite());
+                mRestaurantAdapter.notifyDataSetChanged();
+                break;
+            }
+            i++;
+        }
     }
 }

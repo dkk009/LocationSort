@@ -1,10 +1,8 @@
 package com.restaurant.deepak.restaurant.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.MenuItemCompat;
@@ -13,21 +11,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.restaurant.deepak.restaurant.R;
 import com.restaurant.deepak.restaurant.activities.MainActivity;
+import com.restaurant.deepak.restaurant.adapter.CustomFragmentStatePager;
 import com.restaurant.deepak.restaurant.constants.Constants;
 import com.restaurant.deepak.restaurant.constants.Url;
 import com.restaurant.deepak.restaurant.custom_views.SlidingTabLayout;
@@ -39,7 +37,6 @@ import com.restaurant.deepak.restaurant.network.RequestHandler;
 import com.restaurant.deepak.restaurant.utility.CommonUtility;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -56,6 +53,7 @@ public class MainTabFragment extends BaseFragment implements IntrEventListener{
     private ProgressBar mProgressBar;
     private SearchView mSearchView;
     private RestaurantListResp mRestaurantListResp;
+    private TabAdapter mTabAdapter;
 
     @Nullable
     @Override
@@ -116,15 +114,13 @@ public class MainTabFragment extends BaseFragment implements IntrEventListener{
         mProgressBar.setVisibility(View.GONE);
         mRestaurantListResp = resp;
         String[] title = getResources().getStringArray(R.array.tab_names);
-        TabAdapter tabAdapter = new TabAdapter(MainTabFragment.this,title,mRestaurantListResp);
-        mViewPager.setAdapter(tabAdapter);
+        mTabAdapter = new TabAdapter(MainTabFragment.this,title,mRestaurantListResp);
+        mViewPager.setAdapter(mTabAdapter);
         mSlidingTabLayout.setViewPager(mViewPager);
     }
 
     private void handleRequestFailure(VolleyError error) {
         mProgressBar.setVisibility(View.GONE);
-
-
     }
 
 
@@ -170,9 +166,23 @@ public class MainTabFragment extends BaseFragment implements IntrEventListener{
     }
 
     @Override
-    public void updateFavorite(boolean status, int pos) {
-        mRestaurantListResp.getRestaurantList().get(pos).setFavorite(status);
+    public void updateFavorite(boolean status, Restaurant restaurant) {
+        for(Restaurant res: mRestaurantListResp.getRestaurantList()) {
+            if(res.equals(restaurant)) {
+                res.setFavorite(status);
+            }
+        }
+        for(int i =0;i<mTabAdapter.getCount();i++) {
+
+            if(i != mViewPager.getCurrentItem()) {
+                RestaurantFragment restaurantFragment = ((RestaurantFragment) mTabAdapter.getItem(i));
+                if(null != restaurantFragment)
+                restaurantFragment.updateList(restaurant);
+            }
+        }
+       mTabAdapter.notifyDataSetChanged();
     }
+
 
     public static class  TabAdapter extends FragmentStatePagerAdapter {
 
@@ -181,8 +191,9 @@ public class MainTabFragment extends BaseFragment implements IntrEventListener{
 
         private RestaurantListResp mRestaurantList;
         private Fragment mFragment;
+        private SparseArray<RestaurantFragment> mFragmentList = new SparseArray<>();
         public TabAdapter(MainTabFragment fragment, String[] pageTitle,RestaurantListResp restaurantList) {
-            super(fragment.getFragmentManager());
+            super(fragment.getChildFragmentManager());
             this.pageTitle = pageTitle;
             mRestaurantList = restaurantList;
             mFragment = fragment;
@@ -226,14 +237,30 @@ public class MainTabFragment extends BaseFragment implements IntrEventListener{
                     break;
             }
             baseFragment.setEventListener((MainTabFragment)mFragment);
+            mFragmentList.put(position, baseFragment);
             return baseFragment;
         }
 
 
+        @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            mFragmentList.remove(position);
+            super.destroyItem(container,position,object);
+
+        }
 
         @Override
         public int getCount() {
             return NUM_FRAGMENTS;
+        }
+
+        public RestaurantFragment getRestaurantFragment(int pos) {
+            return mFragmentList.get(pos);
         }
 
         @Override
